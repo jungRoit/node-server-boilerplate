@@ -4,7 +4,7 @@ import * as userService from '../service/userService';
 const usersController = Router();
 
 usersController.get('/', async (req, res, next) => {
-  const response = await userService.getAllUsersService();
+  const response = await userService.getAllUsers();
   res.send(response);
 });
 

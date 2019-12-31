@@ -1,5 +1,5 @@
 module.exports = {
-  development: {
+  dev: {
     client: 'pg',
     connection: 'postgres://localhost/vue-db',
     migration: {
