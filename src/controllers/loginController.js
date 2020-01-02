@@ -50,8 +50,12 @@ loginController.post(
 
     res.status(200).send({
       message: 'Login Success',
-      token: token,
-      user: user
+      token: `Bearer ${token}`,
+      user: {
+        id: user.id,
+        username: user.username,
+        lastLogin: user.lastLogin
+      }
     });
   }
 );
