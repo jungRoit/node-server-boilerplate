@@ -7,6 +7,7 @@ import passwordValidator from '../middlewares/passwordValidator';
 import rePasswordValidator from '../middlewares/rePasswordValidator';
 
 import bcrypt from 'bcryptjs';
+import { generateUUID } from '../utils/uuid';
 
 const signupController = Router();
 
@@ -18,8 +19,7 @@ signupController.post(
   async (req, res, next) => {
     try {
       const user = await userService.getUserByUsername(req.body.username);
-      console.log(user);
-      if (user.length > 0) {
+      if (user) {
         res
           .status(409)
           .header(req.header)
@@ -35,6 +35,7 @@ signupController.post(
           }
 
           userService.insertUser({
+            id: generateUUID(),
             username: req.body.username,
             password: hash
           });
@@ -44,9 +45,9 @@ signupController.post(
         });
       }
     } catch (error) {
-      console.log(error);
       res.status(500).send({
-        message: 'The server got itself in trouble'
+        message: 'Internal Server Error',
+        error: error.toString()
       });
     }
   }

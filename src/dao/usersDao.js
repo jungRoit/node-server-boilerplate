@@ -1,5 +1,6 @@
 import knex from '../db/knex';
 import { generateUUID } from '../utils/uuid';
+
 export const getAllUsers = async () => {
   return await knex.select().from('users');
 };
