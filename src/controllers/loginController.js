@@ -5,8 +5,11 @@ import * as userService from '../service/userService';
 import usernameValidator from '../middlewares/usernameValidator';
 import passwordValidator from '../middlewares/passwordValidator';
 
+import tokenExpirationTime from '../config/constants/tokenExpirationTime';
+
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -38,13 +41,13 @@ loginController.post(
       const accessToken = jwt.sign(
         { username: user.username, id: user.id },
         process.env.SECRET_KEY,
-        { expiresIn: '1 mins' }
+        { expiresIn: tokenExpirationTime.accessToken }
       );
 
       const refreshToken = jwt.sign(
         { username: user.username, id: user.id },
         process.env.SECRET_KEY,
-        { expiresIn: '5 mins' }
+        { expiresIn: tokenExpirationTime.refreshToken }
       );
 
       const updatedData = {
