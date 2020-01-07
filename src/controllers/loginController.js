@@ -25,7 +25,7 @@ loginController.post(
         res.status(401).send({ error: 'Invalid Username' });
       }
 
-      let user = databaseResponse[0];
+      let user = databaseResponse;
 
       const isPasswordCorrect = await bcrypt.compare(
         req.body.password,
@@ -35,10 +35,16 @@ loginController.post(
         res.status(401).send({ error: 'Incorrect Password' });
       }
 
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         { username: user.username, id: user.id },
         process.env.SECRET_KEY,
-        { expiresIn: '1 day' }
+        { expiresIn: '1 mins' }
+      );
+
+      const refreshToken = jwt.sign(
+        { username: user.username, id: user.id },
+        process.env.SECRET_KEY,
+        { expiresIn: '5 mins' }
       );
 
       const updatedData = {
@@ -52,7 +58,8 @@ loginController.post(
 
       res.status(200).send({
         message: 'Login Success',
-        token: `Bearer ${token}`,
+        accessToken: `Bearer ${accessToken}`,
+        refreshToken: refreshToken,
         user: {
           id: user.id,
           username: user.username,
