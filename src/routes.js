@@ -2,6 +2,7 @@ import express from 'express';
 import usersController from './controllers/usersController';
 import loginController from './controllers/loginController';
 import signupController from './controllers/signupController';
+import refreshTokenController from './controllers/refreshTokenController';
 
 import checkAuthorization from './middlewares/checkAuthorization';
 
@@ -13,6 +14,8 @@ Router.get('/', (req, res, next) => {
 
 Router.use('/sign-up', signupController);
 Router.use('/login', loginController);
+
+Router.use('/refresh-token', refreshTokenController);
 
 Router.use(checkAuthorization);
 Router.use('/users', usersController);

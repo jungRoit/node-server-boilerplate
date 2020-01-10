@@ -1,5 +1,6 @@
 const MODELS = {
-  users: 'users'
+  users: 'users',
+  refreshToken: 'refresh_tokens'
 };
 
 export default MODELS;

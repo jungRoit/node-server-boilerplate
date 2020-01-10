@@ -1,12 +1,16 @@
 import { Router } from 'express';
 
 import * as userService from '../service/userService';
+import * as refreshTokenService from '../service/refreshTokenService';
 
 import usernameValidator from '../middlewares/usernameValidator';
 import passwordValidator from '../middlewares/passwordValidator';
 
+import tokenExpirationTime from '../config/constants/tokenExpirationTime';
+
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -25,7 +29,7 @@ loginController.post(
         res.status(401).send({ error: 'Invalid Username' });
       }
 
-      let user = databaseResponse[0];
+      let user = databaseResponse;
 
       const isPasswordCorrect = await bcrypt.compare(
         req.body.password,
@@ -35,10 +39,16 @@ loginController.post(
         res.status(401).send({ error: 'Incorrect Password' });
       }
 
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         { username: user.username, id: user.id },
         process.env.SECRET_KEY,
-        { expiresIn: '1 day' }
+        { expiresIn: tokenExpirationTime.accessToken }
+      );
+
+      const refreshToken = jwt.sign(
+        { username: user.username, id: user.id },
+        process.env.SECRET_KEY,
+        { expiresIn: tokenExpirationTime.refreshToken }
       );
 
       const updatedData = {
@@ -47,12 +57,22 @@ loginController.post(
       };
       await userService.updateLastLogin(updatedData);
       databaseResponse = await userService.getUserByUsername(req.body.username);
-
       user = databaseResponse;
+
+      //register refresh token
+      const refreshTokenObject = {
+        refreshToken: refreshToken,
+        userId: user.id,
+        issuedAt: new Date().toUTCString()
+      };
+      const tokenRes = await refreshTokenService.registerToken(
+        refreshTokenObject
+      );
 
       res.status(200).send({
         message: 'Login Success',
-        token: `Bearer ${token}`,
+        accessToken: `Bearer ${accessToken}`,
+        refreshToken: refreshToken,
         user: {
           id: user.id,
           username: user.username,
