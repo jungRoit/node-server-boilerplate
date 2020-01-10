@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import * as userService from '../service/userService';
+import * as refreshTokenService from '../service/refreshTokenService';
 
 import usernameValidator from '../middlewares/usernameValidator';
 import passwordValidator from '../middlewares/passwordValidator';
@@ -56,8 +57,17 @@ loginController.post(
       };
       await userService.updateLastLogin(updatedData);
       databaseResponse = await userService.getUserByUsername(req.body.username);
-
       user = databaseResponse;
+
+      //register refresh token
+      const refreshTokenObject = {
+        refreshToken: refreshToken,
+        userId: user.id,
+        issuedAt: new Date().toUTCString()
+      };
+      const tokenRes = await refreshTokenService.registerToken(
+        refreshTokenObject
+      );
 
       res.status(200).send({
         message: 'Login Success',
