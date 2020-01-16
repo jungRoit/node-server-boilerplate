@@ -4,15 +4,19 @@ export const genericErrorHandler = (Error, req, res, next) => {
   if (Error.message && Error.code) {
     const error = {
       message: Error.message,
-      details: Error.details,
-      trace: stack
+      data: {
+        details: Error.details,
+        trace: stack
+      }
     };
     res.status(Error.code).json(error);
   } else {
     const error = {
       message: 'Internal Server Error',
-      details: Error.toString(),
-      trace: stack
+      data: {
+        details: Error.toString(),
+        trace: stack
+      }
     };
     res.status(500).json(error);
   }
