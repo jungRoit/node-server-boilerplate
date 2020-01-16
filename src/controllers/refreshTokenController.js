@@ -8,6 +8,7 @@ import * as refreshTokenService from '../service/refreshTokenService';
 
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import BadRequest from '../error/BadRequest';
 dotenv.config();
 
 const refreshTokenController = Router();
@@ -18,8 +19,10 @@ refreshTokenController.post(
   async (req, res, next) => {
     try {
       if (!req.user || !req.user.id || !req.user.username) {
-        res.status(401).send({
-          message: 'Invalid Payload'
+        throw new BadRequest({
+          message: 'Invalid Token',
+          details: 'the token is not valid',
+          code: 401
         });
       } else {
         const tokenDetails = await refreshTokenService.getTokenDetailsByToken({
@@ -27,8 +30,10 @@ refreshTokenController.post(
         });
 
         if (!tokenDetails) {
-          res.status(401).send({
-            message: 'Unregistered Token'
+          throw new BadRequest({
+            message: 'unRegistered Token',
+            details: 'the token is not registered in our system',
+            code: 401
           });
         } else {
           const user = req.user;
@@ -67,10 +72,7 @@ refreshTokenController.post(
         }
       }
     } catch (error) {
-      res.status(500).send({
-        message: 'Internal Server Error',
-        error: error.toString()
-      });
+      next(error);
     }
   }
 );

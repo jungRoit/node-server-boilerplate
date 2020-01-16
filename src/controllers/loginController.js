@@ -12,6 +12,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import dotenv from 'dotenv';
+import BadRequest from '../error/BadRequest';
 dotenv.config();
 
 const loginController = Router();
@@ -26,17 +27,24 @@ loginController.post(
         req.body.username
       );
       if (!databaseResponse) {
-        res.status(401).send({ error: 'Invalid Username' });
+        throw new BadRequest({
+          message: 'Invalid Username',
+          details: 'the username is not registered',
+          code: 401
+        });
       }
 
       let user = databaseResponse;
-
       const isPasswordCorrect = await bcrypt.compare(
         req.body.password,
         user.password
       );
       if (!isPasswordCorrect) {
-        res.status(401).send({ error: 'Incorrect Password' });
+        throw new BadRequest({
+          message: 'Incorrect Password',
+          details: 'the password you entered is incorrect',
+          code: 401
+        });
       }
 
       const accessToken = jwt.sign(
@@ -65,9 +73,7 @@ loginController.post(
         userId: user.id,
         issuedAt: new Date().toUTCString()
       };
-      const tokenRes = await refreshTokenService.registerToken(
-        refreshTokenObject
-      );
+      await refreshTokenService.registerToken(refreshTokenObject);
 
       res.status(200).send({
         message: 'Login Success',
@@ -80,10 +86,7 @@ loginController.post(
         }
       });
     } catch (error) {
-      res.status(500).send({
-        message: 'Internal Server Error',
-        error: error.toString()
-      });
+      next(error);
     }
   }
 );
