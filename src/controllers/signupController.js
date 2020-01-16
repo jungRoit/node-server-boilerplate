@@ -9,6 +9,8 @@ import rePasswordValidator from '../middlewares/rePasswordValidator';
 import bcrypt from 'bcryptjs';
 import { generateUUID } from '../utils/uuid';
 
+import BadRequest from '../error/BadRequest';
+
 const signupController = Router();
 
 signupController.post(
@@ -20,35 +22,26 @@ signupController.post(
     try {
       const user = await userService.getUserByUsername(req.body.username);
       if (user) {
-        res
-          .status(409)
-          .header(req.header)
-          .send({
-            message: 'Username already exist'
-          });
-      } else {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          if (err) {
-            res.status(500).send({
-              message: 'Something went wrong'
-            });
-          }
-
-          userService.insertUser({
-            id: generateUUID(),
-            username: req.body.username,
-            password: hash
-          });
+        throw new BadRequest({
+          message: 'Username already exist',
+          details: `${req.body.username} already exists, Please use another username`,
+          code: 409
         });
+      } else {
+        const hash = await bcrypt.hash(req.body.password, 10);
+
+        await userService.insertUser({
+          id: generateUUID(),
+          username: req.body.username,
+          password: hash
+        });
+
         res.status(200).send({
           message: 'user created succesfully'
         });
       }
     } catch (error) {
-      res.status(500).send({
-        message: 'Internal Server Error',
-        error: error.toString()
-      });
+      next(error);
     }
   }
 );
