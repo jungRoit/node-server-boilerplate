@@ -20,7 +20,7 @@ export default (req, res, next) => {
       next();
     } catch (error) {
       throw new BadRequest({
-        mesage: 'Invalid Token',
+        message: 'Invalid Token',
         details: error.toString(),
         code: 401
       });
