@@ -18,3 +18,5 @@ app.use(genericErrorHandler);
 app.listen(port, () => {
   console.log(`Server running at ${port}`);
 });
+
+export default app;
