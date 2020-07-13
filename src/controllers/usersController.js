@@ -8,6 +8,7 @@ usersController.get('/', async (req, res, next) => {
     const response = await userService.getAllUsers();
     res.status(200).send(response);
   } catch (error) {
+    console.log('user err', error);
     next(error);
   }
 });

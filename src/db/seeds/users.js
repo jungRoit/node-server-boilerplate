@@ -14,11 +14,6 @@ exports.seed = function(knex) {
           id: '5f09979d-7a72-4d49-a067-464b2a1f27c8',
           username: 'roit',
           password: 'roit123'
-        },
-        {
-          id: '5f09979d-7a72-4d49-a067-464b2a1f27c8',
-          username: 'peter',
-          password: 'parker'
         }
       ]);
     });

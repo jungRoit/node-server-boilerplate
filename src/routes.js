@@ -5,6 +5,7 @@ import signupController from './controllers/signupController';
 import refreshTokenController from './controllers/refreshTokenController';
 
 import checkAuthorization from './middlewares/checkAuthorization';
+import {genericErrorHandler} from './middlewares/errorHandler';
 
 const Router = express.Router();
 
@@ -19,5 +20,6 @@ Router.use('/refresh-token', refreshTokenController);
 
 Router.use(checkAuthorization);
 Router.use('/users', usersController);
+Router.use(genericErrorHandler);
 
 export default Router;
